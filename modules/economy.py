@@ -75,7 +75,7 @@ class EconomicAnalyzer:
         Returns:
             Dictionary with savings metrics
         """
-        savings_liters = water_consumed_from_tank
+        savings_liters = water_collected
         savings_cost = savings_liters * self.water_price
         
         if water_collected > 0:
