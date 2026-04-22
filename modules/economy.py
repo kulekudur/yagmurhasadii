@@ -76,7 +76,7 @@ class EconomicAnalyzer:
             Dictionary with savings metrics
         """
         savings_liters = water_collected
-        savings_cost = savings_liters * self.water_price
+        savings_cost = savings_liters/1000 * self.water_price 
         
         if water_collected > 0:
             utilization_rate = (water_consumed_from_tank / water_collected) * 100
