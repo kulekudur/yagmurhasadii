@@ -29,7 +29,7 @@ WORK_START_HOUR = 9                  # Start of working hours (24-hour format)
 WORK_END_HOUR = 17                   # End of working hours (24-hour format)
 
 # ===== ECONOMIC PARAMETERS =====
-WATER_PRICE = 0.50          # Turkish Lira per liter (placeholder)
+WATER_PRICE = 6.50          # Turkish Lira per m³ (per 1000 liters) - realistic municipal rate
 TANK_COST = 5000            # Tank capex in TL (depo maliyeti)
 INSTALLATION_COST = 3500    # Boru, pompa, filtre, first-flush, işçilik
 MAINTENANCE_COST = 500      # Yıllık bakım gideri (TL)

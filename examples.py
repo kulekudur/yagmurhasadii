@@ -169,7 +169,7 @@ def example_5_economic_analysis():
     
     # Create analyzer
     analyzer = EconomicAnalyzer(
-        water_price=0.50,
+        water_price=6.50,  # ₺/m³ (realistic municipal water price)
         tank_cost=5000,
         maintenance_cost_annual=500,
         installation_cost=2000

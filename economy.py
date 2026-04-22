@@ -44,7 +44,7 @@ class EconomicAnalyzer:
         Initialize economic analyzer.
 
         Args:
-            water_price: Price per liter of water (₺)
+            water_price: Price per m³ (1000 liters) of water (₺)
             tank_cost: Cost of storage tank (₺)
             maintenance_cost_annual: Annual maintenance cost (₺)
             installation_cost: Installation/setup cost (₺)
@@ -67,16 +67,17 @@ class EconomicAnalyzer:
     ) -> Dict[str, float]:
         """
         Calculate water savings from rainwater harvesting.
-        
+
         Args:
             water_collected: Total water collected (liters)
             water_consumed_from_tank: Water actually used from tank (liters)
-            
+
         Returns:
             Dictionary with savings metrics
         """
         savings_liters = water_consumed_from_tank
-        savings_cost = savings_liters * self.water_price
+        # water_price is per m³ (1000 liters), convert to total cost
+        savings_cost = (savings_liters / 1000.0) * self.water_price
         
         if water_collected > 0:
             utilization_rate = (water_consumed_from_tank / water_collected) * 100
@@ -274,7 +275,7 @@ class EconomicAnalyzer:
         Returns:
             Dictionary with breakeven metrics
         """
-        annual_value = annual_water_collection * self.water_price
+        annual_value = (annual_water_collection / 1000.0) * self.water_price
         costs = self.calculate_system_costs(years=1)
         
         breakeven_cost = costs['total_cost']
@@ -293,23 +294,23 @@ class EconomicAnalyzer:
     def sensitivity_analysis(
         self,
         annual_water_collection: float,
-        price_range: tuple = (0.3, 0.7)
+        price_range: tuple = (3, 15)
     ) -> Dict[str, Dict[str, float]]:
         """
         Perform sensitivity analysis on water price.
-        
+
         Args:
             annual_water_collection: Expected annual collection (liters)
-            price_range: Tuple of (min_price, max_price)
-            
+            price_range: Tuple of (min_price, max_price) in ₺/m³
+
         Returns:
             Dictionary with ROI at different price points
         """
         scenarios = {}
         original_price = self.water_price
-        
+
         price_points = np.linspace(price_range[0], price_range[1], 5)
-        
+
         for price in price_points:
             self.water_price = price
             roi = self.calculate_roi(

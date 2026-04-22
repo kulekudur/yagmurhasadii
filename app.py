@@ -241,7 +241,7 @@ yağış_tohumu = st.sidebar.number_input(
 st.sidebar.markdown("### 💰 Ekonomi")
 su_fiyatı = st.sidebar.number_input(
     "Su Fiyatı (₺/m³)",
-    min_value=0.0, max_value=500.0, value=config.WATER_PRICE * 1000, step=1.0,
+    min_value=0.0, max_value=500.0, value=config.WATER_PRICE, step=0.5,
 )
 depo_maliyeti = st.sidebar.number_input(
     "Depo Maliyeti (₺)",
@@ -482,7 +482,7 @@ with left_col:
                 rain_seed=yağış_tohumu,
                 external_rainfall=rainfall_array,
             )
-            engine.economy.water_price = su_fiyatı / 1000  # ₺/m³ → ₺/L
+            engine.economy.water_price = su_fiyatı  # ₺/m³
             engine.economy.tank_cost = depo_maliyeti
             engine.economy.installation_cost = kurulum_maliyeti
             engine.economy.maintenance_cost_annual = bakım_maliyeti
@@ -920,7 +920,7 @@ if st.session_state.simulation_run and st.session_state.sim_results:
         with e3:
             st.metric("Net Fayda", f"₺ {financial['net_benefit']:,.0f}")
         with e4:
-            st.metric("Yatırımın G. Dönüşü", f"{financial['roi_percentage']:.1f}%")
+            st.metric("ROI", f"{financial['roi_percentage']:.1f}%")
 
         st.markdown("---")
         p1, p2, p3 = st.columns(3)
