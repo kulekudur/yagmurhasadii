@@ -241,7 +241,7 @@ yağış_tohumu = st.sidebar.number_input(
 st.sidebar.markdown("### 💰 Ekonomi")
 su_fiyatı = st.sidebar.number_input(
     "Su Fiyatı (₺/m³)",
-    min_value=0.0, max_value=500.0, value=config.WATER_PRICE, step=0.5,
+    min_value=0.0, max_value=500000.0, value=config.WATER_PRICE, step=0.5,
 )
 depo_maliyeti = st.sidebar.number_input(
     "Depo Maliyeti (₺)",
