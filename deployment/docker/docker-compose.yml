@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgis/postgis:14-3.3-alpine
+    container_name: rainwater_postgres
+    environment:
+      POSTGRES_USER: rainwater
+      POSTGRES_PASSWORD: rainwater_dev_pass
+      POSTGRES_DB: rainwater_dev
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rainwater"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rainwater_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: rainwater_redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rainwater_network
+
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: rainwater_influxdb
+    environment:
+      INFLUXDB_DB: rainwater
+      INFLUXDB_ADMIN_USER: admin
+      INFLUXDB_ADMIN_PASSWORD: admin_pass
+      INFLUXDB_HTTP_AUTH_ENABLED: "true"
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rainwater_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: rainwater_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@rainwater.local
+      PGADMIN_DEFAULT_PASSWORD: admin_pass
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - rainwater_network
+
+  # Backend API (will be built from local Dockerfile)
+  backend:
+    build:
+      context: .
+      dockerfile: deployment/docker/Dockerfile.backend
+    container_name: rainwater_backend
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: postgresql://rainwater:rainwater_dev_pass@postgres:5432/rainwater_dev
+      REDIS_URL: redis://redis:6379
+      INFLUXDB_URL: http://influxdb:8086
+      DEBUG: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+    networks:
+      - rainwater_network
+
+  # Streamlit Frontend (optional, can run separately)
+  frontend:
+    build:
+      context: .
+      dockerfile: deployment/docker/Dockerfile.frontend
+    container_name: rainwater_frontend
+    command: streamlit run frontend/streamlit_app.py --server.port=8501 --server.address=0.0.0.0
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    environment:
+      API_URL: http://backend:8000/api/v1
+    depends_on:
+      - backend
+    networks:
+      - rainwater_network
+
+volumes:
+  postgres_data:
+  redis_data:
+  influxdb_data:
+  pgadmin_data:
+
+networks:
+  rainwater_network:
+    driver: bridge

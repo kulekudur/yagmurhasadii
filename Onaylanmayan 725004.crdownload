@@ -1,0 +1,20 @@
+[pytest]
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+addopts = 
+    --strict-markers
+    --tb=short
+    --verbose
+    -v
+    --cov=backend
+    --cov=core
+    --cov=data
+    --cov-report=html:htmlcov
+    --cov-report=term-missing
+markers =
+    unit: Unit tests for individual functions
+    integration: Integration tests for service interactions
+    slow: Tests that take longer than 1 second
+    asyncio: Tests using async/await
