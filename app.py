@@ -920,7 +920,7 @@ if st.session_state.simulation_run and st.session_state.sim_results:
         with e3:
             st.metric("Net Fayda", f"₺ {financial['net_benefit']:,.0f}")
         with e4:
-            st.metric("ROI", f"{financial['roi_percentage']:.1f}%")
+            st.metric("Yatırımın G. Dönüşü", f"{financial['roi_percentage']:.1f}%")
 
         st.markdown("---")
         p1, p2, p3 = st.columns(3)
